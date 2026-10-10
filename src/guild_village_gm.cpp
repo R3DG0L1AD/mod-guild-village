@@ -159,7 +159,7 @@ namespace
                 {
                     WorldDatabase.Execute(
                         "INSERT INTO creature "
-                        "(id1, map, spawnMask, phaseMask, position_x, position_y, position_z, orientation, "
+                        "(id, map, spawnMask, phaseMask, position_x, position_y, position_z, orientation, "
                         " spawntimesecs, wander_distance, MovementType, Comment) "
                         "VALUES ({}, {}, 1, {}, {}, {}, {}, {}, {}, {}, {}, 'Village mob')",
                         entry, mapId, phaseId, x, y, z, o, respawnSec, wander, (uint32)moveType
@@ -349,7 +349,7 @@ namespace
     {
         if (QueryResult r = WorldDatabase.Query(
                 "SELECT 1 FROM creature "
-                "WHERE map={} AND phaseMask={} AND id1={} "
+                "WHERE map={} AND phaseMask={} AND id={} "
                 "  AND ABS(position_x - {}) < 0.05 "
                 "  AND ABS(position_y - {}) < 0.05 "
                 "  AND ABS(position_z - {}) < 0.10 "
@@ -384,7 +384,7 @@ namespace
         {
             WorldDatabase.Execute(
                 "INSERT INTO creature "
-                "(id1, map, spawnMask, phaseMask, position_x, position_y, position_z, orientation, "
+                "(id, map, spawnMask, phaseMask, position_x, position_y, position_z, orientation, "
                 " spawntimesecs, wander_distance, MovementType, Comment) "
                 "VALUES ({}, {}, 1, {}, {}, {}, {}, {}, {}, {}, {}, 'Init mod expansion')",
                 entry, mapId, phaseId, x, y, z, o,

@@ -1,6 +1,7 @@
 // modules/mod-guild-village/src/guild_village_respawn.cpp
 
 #include "ScriptMgr.h"
+#include "gv_familylan.h"
 #include "Player.h"
 #include "Guild.h"
 #include "DatabaseEnv.h"
@@ -48,7 +49,7 @@ static bool FindSpiritHealerPos(uint32 map, uint32 phaseId, float& x, float& y, 
 {
     if (QueryResult res = WorldDatabase.Query(
         "SELECT position_x, position_y, position_z, orientation "
-        "FROM creature WHERE id1=6491 AND map={} AND phaseMask={} LIMIT 1",
+        "FROM creature WHERE id=6491 AND map={} AND phaseMask={} LIMIT 1",
         map, phaseId))
     {
         Field* f = res->Fetch();
@@ -74,16 +75,17 @@ public:
         if (!player)
             return;
 
-        Guild* g = player->GetGuild();
-        if (!g)
+        if (player->GetMapId() != DefMap())
             return;
 
-        if (player->GetMapId() != DefMap())
+        // Family LAN D6: party bots of a village-guild player use that village too
+        uint32 villageGuild = GuildVillageFamilyLan::VillageGuildFor(player);
+        if (!villageGuild)
             return;
 
         uint32 map = 0, phaseId = 0;
         float baseX=0, baseY=0, baseZ=0, baseO=0;
-        if (!LoadVillageRow(g->GetId(), map, baseX, baseY, baseZ, baseO, phaseId))
+        if (!LoadVillageRow(villageGuild, map, baseX, baseY, baseZ, baseO, phaseId))
             return;
 
         player->CustomData.GetDefault<GVPhaseData>("gv_phase")->phaseMask = phaseId;
@@ -99,7 +101,7 @@ public:
 
         // Volitelné info
         ChatHandler(player->GetSession()).SendSysMessage(
-            "|cff00ff00[Guild Village]|r Duch vzkříšení tě přivolal do tvojí guildovní vesnice…");
+            "|cff00ff00[Guild Village]|r The Spirit Healer calls you back to your guild village...");
     }
 
     [[nodiscard]] bool OnPlayerCanRepopAtGraveyard(Player* player) override

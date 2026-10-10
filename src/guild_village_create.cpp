@@ -1,6 +1,7 @@
 // modules/mod-guild-village/src/guild_village_create.cpp
 
 #include "ScriptMgr.h"
+#include "gv_familylan.h"
 #include "Config.h"
 #include "Creature.h"
 #include "ScriptedGossip.h"
@@ -169,7 +170,7 @@ namespace GuildVillage
                 if (!map)
                 {
                     WorldDatabase.Execute(
-                        "INSERT INTO creature (id1,map,spawnMask,phaseMask,position_x,position_y,position_z,orientation,spawntimesecs,wander_distance,MovementType,Comment) "
+                        "INSERT INTO creature (id,map,spawnMask,phaseMask,position_x,position_y,position_z,orientation,spawntimesecs,wander_distance,MovementType,Comment) "
                         "VALUES ({}, {}, 1, {}, {}, {}, {}, {}, {}, {}, {}, 'Village mob')",
                         entry, mapId, phaseId, x, y, z, o, resp, wander, (uint32)mt
                     );
@@ -279,7 +280,7 @@ namespace GuildVillage
                 if (!map)
                 {
                     WorldDatabase.Execute(
-                        "INSERT INTO creature (id1,map,spawnMask,phaseMask,position_x,position_y,position_z,orientation,spawntimesecs,wander_distance,MovementType) "
+                        "INSERT INTO creature (id,map,spawnMask,phaseMask,position_x,position_y,position_z,orientation,spawntimesecs,wander_distance,MovementType) "
                         "VALUES ({}, {}, 1, {}, {}, {}, {}, {}, {}, {}, {})",
                         entry, mapId, phaseId, x, y, z, o, resp, wander, (uint32)mt
                     );
@@ -789,7 +790,8 @@ namespace GuildVillage
 
                 if (Player const* p = worldObject->ToPlayer())
                 {
-                    if (uint32 gid = p->GetGuildId())
+                    // Family LAN D6: party bots of a village-guild player get that village's phase
+                    if (uint32 gid = GuildVillageFamilyLan::VillageGuildFor(p))
                         if (QueryResult r = WorldDatabase.Query("SELECT phase FROM customs.gv_guild WHERE guild={}", gid))
                             if (uint32 phaseId = (*r)[0].Get<uint32>())
                                 newPhaseMask = phaseId;

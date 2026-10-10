@@ -9,6 +9,7 @@
 #include "StringFormat.h"
 #include "Log.h"
 #include "GameTime.h"
+#include "gv_familylan.h"
 
 #include <optional>
 #include <unordered_map>
@@ -51,15 +52,11 @@ namespace GuildVillage
     static inline bool IsInVillageMap(Player* p) { return p && p->GetMapId() == DefMap(); }
 
     // Má hráč guildu, která má záznam v customs.gv_guild?
-    static bool HasGuildVillage(Player* p)
+    // Family LAN D6: also true for a playerbot grouped with a village-guild player (on the village map when requireMap)
+    static bool HasGuildVillage(Player* p, uint32 requireMap = 0)
     {
         if (!p) return false;
-        Guild* g = p->GetGuild();
-        if (!g) return false;
-
-        if (QueryResult r = WorldDatabase.Query("SELECT 1 FROM customs.gv_guild WHERE guild={}", g->GetId()))
-            return true;
-        return false;
+        return GuildVillageFamilyLan::VillageGuildFor(p, requireMap) != 0;
     }
 
     static void TeleportToSafeCity(Player* p)
@@ -75,7 +72,7 @@ namespace GuildVillage
             return;
 
         // Cizinec (nebo hráč bez guildy) nemá co dělat v mapě vesnice
-        if (IsInVillageMap(p) && !HasGuildVillage(p))
+        if (IsInVillageMap(p) && !HasGuildVillage(p, DefMap()))
             TeleportToSafeCity(p);
     }
 
