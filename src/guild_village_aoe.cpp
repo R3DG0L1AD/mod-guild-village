@@ -558,7 +558,7 @@ namespace GuildVillageAoe
         {
             if (!loot->items[lootSlot].is_blocked)
             {
-                Roll roll(lguid, loot->items[lootSlot]);
+                Roll roll(lguid, loot->items[lootSlot], player->GetMap()->IsRaid());   // upstream 77f88f75c: Roll() now takes _lootedInRaid (core passes pLootedObject->GetMap()->IsRaid())
                 roll.itemSlot = lootSlot;
                 roll.setLoot(loot);
 
